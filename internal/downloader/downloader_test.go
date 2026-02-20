@@ -1,8 +1,11 @@
 package downloader
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -18,8 +21,19 @@ func TestDownload_Success(t *testing.T) {
 		Timeout: 10 * time.Second,
 	}
 
-	err := Download(client, server.URL+"/file.txt", dir, "fallback.txt")
+	ctx := context.Background()
+
+	err := Download(ctx, client, server.URL+"/file.txt", dir, "file.txt")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(dir, "/file.txt"))
+	if err != nil {
+		t.Fatalf("unable to read file: %v", err)
+	}
+
+	if string(data) != "hello" {
+		t.Fatalf("unexpected content: %s", string(data))
 	}
 }
