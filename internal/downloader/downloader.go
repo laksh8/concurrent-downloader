@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,8 +11,8 @@ import (
 	"github.com/laksh8/concurrent-downloader/internal/util"
 )
 
-func Download(client *http.Client, rawUrl string, destDir string, fallback string) error {
-	req, err := http.NewRequest(http.MethodGet, rawUrl, nil)
+func Download(ctx context.Context, client *http.Client, rawUrl string, destDir string, fallback string) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawUrl, nil)
 	if err != nil {
 		return fmt.Errorf("invalid request: %w", err)
 	}
