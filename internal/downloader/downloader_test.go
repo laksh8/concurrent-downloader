@@ -37,3 +37,14 @@ func TestDownload_Success(t *testing.T) {
 		t.Fatalf("unexpected content: %s", string(data))
 	}
 }
+
+func TestDownload_InvalidURL(t *testing.T) {
+	dir := t.TempDir()
+	client := &http.Client{}
+	ctx := context.Background()
+
+	err := Download(ctx, client, "://bad-url", dir, "fallback.txt")
+	if err == nil {
+		t.Fatalf("expected error for invalid URL")
+	}
+}
