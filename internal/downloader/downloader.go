@@ -11,7 +11,11 @@ import (
 	"github.com/laksh8/concurrent-downloader/internal/util"
 )
 
-func Download(ctx context.Context, client *http.Client, rawUrl string, destDir string, fallback string) error {
+type Options struct {
+	DeleteOnError bool
+}
+
+func Download(opts Options, ctx context.Context, client *http.Client, rawUrl string, destDir string, fallback string) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawUrl, nil)
 	if err != nil {
 		return fmt.Errorf("invalid request: %w", err)
@@ -33,11 +37,20 @@ func Download(ctx context.Context, client *http.Client, rawUrl string, destDir s
 	if err != nil {
 		return fmt.Errorf("unable to create file: %w", err)
 	}
-	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
+	closeErr := file.Close()
 	if err != nil {
+		if opts.DeleteOnError {
+			os.Remove(fullPath)
+		}
 		return fmt.Errorf("unable to download to file: %w", err)
+	}
+	if closeErr != nil {
+		if opts.DeleteOnError {
+			os.Remove(fullPath)
+		}
+		return fmt.Errorf("file close failed: %w", closeErr)
 	}
 	return nil
 }
