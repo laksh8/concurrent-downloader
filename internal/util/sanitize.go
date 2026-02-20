@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-func SafeFileName(rawurl string, fallback string) string {
+func SafeFilename(rawurl string, fallback string) string {
 
 	u, err := url.Parse(rawurl)
 	if err != nil {

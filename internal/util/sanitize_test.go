@@ -17,7 +17,7 @@ func TestSafeFilename(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := SafeFileName(tt.url, "fallback.bin")
+			got := SafeFilename(tt.url, "fallback.bin")
 			if got != tt.want {
 				t.Fatalf("got %q want %q", got, tt.want)
 			}
@@ -36,7 +36,7 @@ func TestSafeFileName_WindowsReservedNames(t *testing.T) {
 
 	for _, name := range cases {
 		url := "https://example.com/" + name
-		got := SafeFileName(url, fallback)
+		got := SafeFilename(url, fallback)
 
 		if got != fallback {
 			t.Errorf("expected fallback for %s, got %s", name, got)
