@@ -70,3 +70,25 @@ func TestDownload_ContextCancelledImmediately(t *testing.T) {
 		t.Fatalf("expected context cancellation error")
 	}
 }
+
+func TestDownload_ContextCancelledDuringTransfer(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for i := 0; i < 10; i++ {
+			w.Write([]byte("chunk"))
+			w.(http.Flusher).Flush()
+			time.Sleep(500 * time.Millisecond)
+		}
+	}))
+	defer server.Close()
+
+	dir := t.TempDir()
+	client := &http.Client{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	err := Download(opts_default, ctx, client, server.URL+"/file.txt", dir, "file.txt")
+	if err == nil {
+		t.Fatalf("expected cancellation error")
+	}
+}
