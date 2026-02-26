@@ -11,10 +11,6 @@ import (
 	"github.com/laksh8/concurrent-downloader/internal/util"
 )
 
-type Options struct {
-	DeleteOnError bool
-}
-
 func Download(opts Options, ctx context.Context, client *http.Client, rawUrl string, destDir string, fallback string) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawUrl, nil)
 	if err != nil {
